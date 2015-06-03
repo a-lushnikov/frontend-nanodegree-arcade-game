@@ -15,9 +15,7 @@
  */
 
 var timeSinceLastEnemy = 0; // used to generate new enemies after some time
-var waitTillNextEnemy = 0; // time to wait till next enemy will be generated
-var timeSinceLastCollectible = 0;
-var waitTillNextCollectible = 1;
+var waitTillNext = 0; // time to wait till next enemy will be generated
 
 var EngineConfig = {
     canvasWidth: 1010,
@@ -32,7 +30,7 @@ var EngineConfig = {
     startingRow: 7, // 0 - water
 
     score: 0,
-    lives: 3,
+    lives: 1,
     level: 1,
 
     isDead: false
@@ -99,9 +97,8 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        lastTime = Date.now();
-        player = new Player();
         reset();
+        lastTime = Date.now();
         main();
     }
 
@@ -136,32 +133,21 @@ var Engine = (function(global) {
         scrCtx.font ='30px "Sigmar One"';
         scrCtx.fillText('Score : ' + EngineConfig.score, 10, scoreCanvas.height / 2 - 40);
         scrCtx.fillText('Level : ' + EngineConfig.level, 10, scoreCanvas.height / 2);
-        if (player instanceof ChuckNorris) {
-            scrCtx.fillText('Chuck Norris mode activated', 10, scoreCanvas.height / 2 + 40);
-        }
-
 
         for(i = 1; i <= EngineConfig.lives ; i++ ) {
             scrCtx.drawImage(Resources.get('images/Heart.png'), scoreCanvas.width - 60 * i, 0, 50, 85);
         }
 
     }
-
-    function createCollectible () {
-        var r = player.row;
-        var c = player.col;
-
-        var crow = r;
-        var ccol = c;
-
-        while(crow == r || ccol == c) {
-            crow = Math.floor(Math.random() * (EngineConfig.gameRows - 1));
-            ccol = Math.floor(Math.random() * (EngineConfig.gameCols - 1));
-        }
-
-        collectible = new Collectible('heart', crow, ccol);
-        console.log(crow, ccol);
-    }
+    /* This function is called by main (our game loop) and itself calls all
+     * of the functions which may need to update entity's data. Based on how
+     * you implement your collision detection (when two entities occupy the
+     * same space, for instance when your character should die), you may find
+     * the need to add an additional function call here. For now, we've left
+     * it commented out - you may or may not want to implement this
+     * functionality this way (you could just implement collision detection
+     * on the entities themselves within your app.js file).
+     */
 
     function update(dt) {
         // general updatea
@@ -171,13 +157,12 @@ var Engine = (function(global) {
             return;
         }
 
-        updatePlayer(dt);
-        updateCollectible(dt);
+        updatePlayer();
 
 
         // collision logic
-        var collidingEnemies = getCollisions();
-        if(collidingEnemies.length > 0) {
+        var collidingEnemies = undefined;
+        if(collidingEnemies = getCollisions()) {
             if (!player.superPowers) {
                 EngineConfig.lives = EngineConfig.lives - 1;
                 if (EngineConfig.lives == 0) {
@@ -199,21 +184,13 @@ var Engine = (function(global) {
         }
 
         // count elapsed time
-        timeSinceLastEnemy = timeSinceLastEnemy + dt;
-        timeSinceLastCollectible = timeSinceLastCollectible + dt;
+        this.timeSinceLastEnemy = this.timeSinceLastEnemy + dt;
 
         // generate new enemies
-        if(timeSinceLastEnemy >= waitTillNextEnemy) {
-            waitTillNextEnemy = Math.random() * 1.0;
-            timeSinceLastEnemy = 0;
+        if(timeSinceLastEnemy >= waitTillNext) {
+            this.waitTillNext = Math.random() * 1.0;
+            this.timeSinceLastEnemy = 0;
             createNewEnemy();
-        }
-
-        // generate new collectibles
-        if(timeSinceLastCollectible >= waitTillNextCollectible) {
-            createCollectible();
-            timeSinceLastCollectible = 0;
-            waitTillNextCollectible = 9000;
         }
 
         // check if player has reached the water
@@ -233,6 +210,12 @@ var Engine = (function(global) {
      * the data/properties related to  the object. Do your drawing in your
      * render methods.
      */
+    // function updateEnemies(dt) {
+    //     allEnemies.forEach(function(enemy) {
+    //         enemy.update(dt);
+    //     });
+    //     player.update();
+    // }
 
     function updateEnemies(dt) {
         // update and GC enemies which are out of screen
@@ -244,15 +227,8 @@ var Engine = (function(global) {
         }
     }
 
-    function updatePlayer(dt) {
-        player.update(dt);
-    }
-
-    function updateCollectible(dt) {
-        if (collectible) {
-            collectible.update(dt);
-        }
-
+    function updatePlayer() {
+        player.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -261,12 +237,6 @@ var Engine = (function(global) {
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
      */
-
-    function renderCollectible () {
-        if(collectible) {
-            collectible.render();
-        }
-    }
 
     function renderDeadMenu () {
         if(EngineConfig.isDead) {
@@ -340,8 +310,6 @@ var Engine = (function(global) {
         renderEntities();
 
         renderDeadMenu();
-
-        renderCollectible();
     }
 
     /* This function is called by the render function and is called on each game
@@ -364,11 +332,7 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        var man = new Player();
-        if (player instanceof ChuckNorris) {
-            man = new ChuckNorris();
-        };
-        restartGame(man);
+        restartGame(new Player());
     }
 
     /* Go ahead and load all of the images we know we're going to need to
