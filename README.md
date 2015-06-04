@@ -1,6 +1,10 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+Well, this is frogger game clone.
 
-for self-checking their submission.
+Use arrows to move character.
+Collect hearts and gems to get more lives or better score.
+Don't touch bugs.
+
+Press "1" to normal game mode and "2" for super powers.
