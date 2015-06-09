@@ -1,5 +1,4 @@
-##Frogger Clone game
-===============================
+#Frogger Clone game
 
 Well, this is frogger game clone.
 
