@@ -1,9 +1,9 @@
 var EngineConfig = {
     canvasWidth: 1010,
-    canvasHeight: 760,
+    canvasHeight: 750,
 
     scoreCanvasWidth: 1010,
-    scoreCanvasHeight: 150,
+    scoreCanvasHeight: 120,
 
     gameRows: 8,
     gameCols: 12,
@@ -136,10 +136,10 @@ var Engine = (function(global) {
         scrCtx.clearRect (0, 0, scoreCanvas.width, scoreCanvas.height );
 
         scrCtx.font ='30px "Sigmar One"';
-        scrCtx.fillText('Score : ' + Game.score, 10, scoreCanvas.height / 2 - 40);
+        scrCtx.fillText('Score : ' + Game.score, 10, scoreCanvas.height / 2 - 30);
         scrCtx.fillText('Level : ' + Game.level, 10, scoreCanvas.height / 2);
         if (Game.player instanceof ChuckNorris) {
-            scrCtx.fillText('Chuck Norris mode activated', 10, scoreCanvas.height / 2 + 40);
+            scrCtx.fillText('Chuck Norris mode activated', 10, scoreCanvas.height / 2 + 30);
         }
 
 
