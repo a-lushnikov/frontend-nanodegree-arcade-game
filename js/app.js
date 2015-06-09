@@ -6,18 +6,22 @@ var Game = {
     player: undefined,
     collectible: undefined, // can only have 1 collectible on screen at a time
 
-    waitTillNextCollectible: 6, // s
-    timeSinceLastCollectible: 0,
+    waitTillNextCollectible: 6, // measured in seconds
+    timeSinceLastCollectible: 0, // measured in seconds
 
-    timeSinceLastEnemy: 0,
-    waitTillNextEnemy: 0,
+    timeSinceLastEnemy: 0, // measured in seconds
+    waitTillNextEnemy: 0, // measured in seconds
 
     lives: 3,
     score: 0,
     level: 1,
 
+    // reset game function
+    // called either when player has died or simply restaring the game
+    // (bug collision, water reached)
     resetGame: function (man) {
 
+        // in case player was totally dead - restart the game with default score
         if (EngineConfig.isDead) {
             EngineConfig.isDead = false;
             Game.score = 0;
@@ -25,6 +29,7 @@ var Game = {
             Game.level = 1;
         }
 
+        // reset collectibles, enemies, player
         Game.collectible = null;
         Game.allEnemies = [];
         for (var i = 1; i < 10 ; i++) {
@@ -36,12 +41,14 @@ var Game = {
 };
 
 
-// utility class with helpful functions
+// utility class with functions
 var Utils = {
+    // get X coord by col
     getX: function (col) {
         return col * 101;
     },
 
+    // get Y coord by row
     getY: function (row) {
         if(row < 0) {
             return 60-83;
@@ -87,7 +94,7 @@ GameObject.prototype.render = function () {
 // Collectible item class
 //------------------------------------------------------------------------------
 // type - type of collectible item
-// row, column - where item wil appear
+// row, column - where item will appear
 var Collectible = function (type, row, column) {
     this.type = type;
     this.setRow(row);
@@ -104,6 +111,7 @@ var Collectible = function (type, row, column) {
 
     var dieIn = this.dieIn;
 
+    // function resets collectible by timeout
     var resetCollectible = function () {
         // reset only in case it was not collected by player
         if(Game.collectible !== null) {
@@ -124,13 +132,14 @@ Collectible.prototype.update = function (dt) {
     this.liveTime = this.liveTime + dt;
 };
 
+// to be called when collected by player
 Collectible.prototype.getCollected = function () {
     Game.waitTillNextCollectible = (this.dieIn + 1000) / 1000 + Math.random() * 1.0;
     Game.timeSinceLastCollectible = 0;
     Game.collectible = null;
 };
 
-// need to override because of scaling issues
+// need to override GameObject render because of scaling issues
 Collectible.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x + 25, this.y + 65, 50, 85);
 };
