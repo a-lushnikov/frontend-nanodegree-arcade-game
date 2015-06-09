@@ -1,20 +1,23 @@
+'use strict';
+
 // main game objects
 var Game = {
-    allEnemies : undefined,
-    player : undefined,
-    collectible : undefined, // can only have 1 collectible on screen at a time
+    allEnemies: undefined,
+    player: undefined,
+    collectible: undefined, // can only have 1 collectible on screen at a time
 
-    waitTillNextCollectible : 6, // s
-    timeSinceLastCollectible : 0,
+    waitTillNextCollectible: 6, // s
+    timeSinceLastCollectible: 0,
 
-    timeSinceLastEnemy : 0,
-    waitTillNextEnemy : 0,
+    timeSinceLastEnemy: 0,
+    waitTillNextEnemy: 0,
 
     lives: 3,
     score: 0,
     level: 1,
 
-    resetGame : function (man) {
+    resetGame: function (man) {
+
         if (EngineConfig.isDead) {
             EngineConfig.isDead = false;
             Game.score = 0;
@@ -24,31 +27,31 @@ var Game = {
 
         Game.collectible = null;
         Game.allEnemies = [];
-        for (i = 1; i < 10 ; i++) {
+        for (var i = 1; i < 10 ; i++) {
             Game.allEnemies.push(new Enemy(i % 5, 100 + 120 * Math.random(), true));
         }
 
         Game.player = man;
     }
-}
+};
 
 
 // utility class with helpful functions
 var Utils = {
-    getX : function (col) {
+    getX: function (col) {
         return col * 101;
     },
 
-    getY : function (row) {
+    getY: function (row) {
         if(row < 0) {
             return 60-83;
-        } else if (row == 0) {
+        } else if (row === 0) {
             return 60;
         } else {
             return 60 + 83 * row;
         }
     }
-}
+};
 
 
 //==============================================================================
@@ -61,19 +64,19 @@ var Utils = {
 var GameObject = function (r,c) {
     this.setRow(r);
     this.setCol(c);
-}
+};
 
 // sets row and updates y
 GameObject.prototype.setRow = function (row) {
     this.row = row;
     this.y = Utils.getY(this.row);
-}
+};
 
 // sets col and updates x
 GameObject.prototype.setCol = function (col) {
     this.col = col;
     this.x = Utils.getX(col);
-}
+};
 
 GameObject.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -91,10 +94,10 @@ var Collectible = function (type, row, column) {
     this.setCol(column);
     this.dieIn = 0;
 
-    if (this.type == 'heart') {
+    if (this.type === 'heart') {
         this.sprite = 'images/Heart.png';
         this.dieIn = 5000;
-    } else if (this.type == 'gem-blue') {
+    } else if (this.type === 'gem-blue') {
         this.sprite = 'images/Gem Blue.png';
         this.dieIn = 5000;
     }
@@ -103,13 +106,13 @@ var Collectible = function (type, row, column) {
 
     var resetCollectible = function () {
         // reset only in case it was not collected by player
-        if(Game.collectible != null) {
+        if(Game.collectible !== null) {
             Game.waitTillNextCollectible = (dieIn + 1000) / 1000 + Math.random() * 1.0;
             Game.timeSinceLastCollectible = 0;
 
             Game.collectible = null;
         }
-    }
+    };
 
     setTimeout(function() { resetCollectible(); }, this.dieIn);
 };
@@ -119,18 +122,18 @@ Collectible.prototype.constructor = Collectible;
 
 Collectible.prototype.update = function (dt) {
     this.liveTime = this.liveTime + dt;
-}
+};
 
 Collectible.prototype.getCollected = function () {
     Game.waitTillNextCollectible = (this.dieIn + 1000) / 1000 + Math.random() * 1.0;
     Game.timeSinceLastCollectible = 0;
     Game.collectible = null;
-}
+};
 
 // need to override because of scaling issues
 Collectible.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x + 25, this.y + 65, 50, 85);
-}
+};
 
 
 //------------------------------------------------------------------------------
@@ -163,8 +166,8 @@ Enemy.prototype.collide = function (player) {
     if (player instanceof ChuckNorris) {
         // then we have some problems
         // kill self
-        for ( i = Game.allEnemies.length - 1; i >= 0; i--) {
-            if (Game.allEnemies[i] == this) {
+        for (var i = Game.allEnemies.length - 1; i >= 0; i--) {
+            if (Game.allEnemies[i] === this) {
                 Game.allEnemies.splice(i, 1);
             }
         }
@@ -172,7 +175,7 @@ Enemy.prototype.collide = function (player) {
         // then everything is ok from enemy prospective
         return;
     }
-}
+};
 
 
 
@@ -191,7 +194,7 @@ var Player = function () {
 Player.prototype = Object.create(GameObject.prototype);
 Player.prototype.constructor = Player;
 
-Player.prototype.update = function (dt) {
+Player.prototype.update = function () {
 
 };
 
@@ -224,7 +227,7 @@ Player.prototype.collide = function(object) {
             Game.resetGame(new Player());
         }
     }
-}
+};
 
 
 Player.prototype.collect = function(object) {
@@ -238,7 +241,7 @@ Player.prototype.collect = function(object) {
             Game.score = Game.score + 5000;
         }
     }
-}
+};
 
 
 
@@ -251,7 +254,7 @@ var ChuckNorris = function () {
 
     this.sprite = 'images/char-horn-girl.png';
     this.superPowers = true;
-}
+};
 
 ChuckNorris.prototype = Object.create(Player.prototype);
 ChuckNorris.prototype.constructor = ChuckNorris;
@@ -264,7 +267,7 @@ ChuckNorris.prototype.collide = function(enemy) {
             Game.lives = 10;
         }
     }
-}
+};
 
 
 
