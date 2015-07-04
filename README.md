@@ -15,3 +15,7 @@ Don't touch bugs.
 Try to reach the water.
 
 Press "1" to normal game mode and "2" for super powers.
+
+* Udacity provided the art assets and game engine.
+* Coded player, enemies, and other game entities in JavaScript's object-oriented pseudo-classical style.
+* Created enemy subclasses with different movement patterns and sprites.
