@@ -4,7 +4,7 @@ Well, this is frogger game clone created as a part of udacity frontend nanodegre
 
 To start the game - simply open index.html in any browser. Your browser should support canvas!
 
-![alt tag](https://github.com/genesisuda/frontend-nanodegree-arcade-game/blob/master/images/preview.png)
+![alt tag](https://github.com/a-lushnikov/frontend-nanodegree-arcade-game/blob/master/images/preview.png)
 
 Use arrows to move character.
 
